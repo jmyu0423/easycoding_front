@@ -1,8 +1,10 @@
 import { AnyAction, combineReducers, configureStore } from '@reduxjs/toolkit'
 import memberSlice from './../features/mypage/MemberSlice'
+import BoardSlice from './mypage/BoardSlice'
 
 const appReducer = combineReducers({
-    member: memberSlice
+    member: memberSlice,
+    board: BoardSlice
 })
 
 const reducerProxy = (state: any, action: AnyAction) => {
