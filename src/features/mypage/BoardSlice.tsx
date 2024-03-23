@@ -5,7 +5,7 @@ const initialState: any = {
     loading: false,
     successFlag: false,
     dataList: [],
-    selectId: '',
+    selectedId: '',
     selectedIdList: [],
     selectBoard: {
         title: '',
@@ -30,10 +30,10 @@ export const getBoards = createAsyncThunk(
 //게시판 등록
 export const createBoards = createAsyncThunk(
     'board/create',
-    async (intput: any, { rejectWithValue, getState }) => {
+    async (input: any, { rejectWithValue, getState }) => {
         const data = {
-            title: intput.title,
-            content: intput.content,
+            title: input.title,
+            content: input.content,
             regSeq: 1,
         }
         try {
@@ -67,7 +67,28 @@ export const deleteBoards = createAsyncThunk(
         }
     }
 )
-
+//게시판 수정
+export const updateBoards = createAsyncThunk(
+    'board/update',
+    async (input: any, { rejectWithValue, getState }) => {
+        const state = getState() as AppState
+        const { selectedId } = state.board
+        const data = {
+            title: input.title,
+            content: input.content,
+            seq: selectedId
+        }
+        try {
+            return await axiosInstance.post<any>('/updateBoards', data)
+        } catch (error: any) {
+            if (error.response && error.response.data) {
+                return rejectWithValue(error.response.data)
+            } else {
+                return rejectWithValue(error.message)
+            }
+        }
+    }
+)
 const board = createSlice({
     name: 'board',
     initialState,
@@ -78,6 +99,9 @@ const board = createSlice({
         setSelectedIdList(state, action) {
             state.selectedIdList = action.payload
         },
+        setSelectedId(state, action) {
+            state.selectedId = action.payload
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -86,7 +110,7 @@ const board = createSlice({
                     state.dataList = payload.data
                 })
             .addMatcher(
-                isFulfilled(createBoards, deleteBoards), (state, { payload }) => {
+                isFulfilled(createBoards, deleteBoards, updateBoards), (state, { payload }) => {
                     state.successFlag = true
                 })
     }
@@ -94,7 +118,8 @@ const board = createSlice({
 
 export const {
     setSuccessFlag,
-    setSelectedIdList
+    setSelectedIdList,
+    setSelectedId
 } = board.actions
 
 export default board.reducer

@@ -8,15 +8,34 @@ import {
 } from '@mui/material';
 import { useState, useEffect } from 'react'
 import { GridInputWrapper } from './common/pure/GridStyled'
+import { useAppDispatch, useAppSelector } from '../../helper/hooks'
+import { setSelectedId } from '../../features/mypage/BoardSlice'
 
 const CreateBoard = ({ handleOk, handleClose, open }: any) => {
-    const [intput, setInput] = useState({ title: '', content: '' })
+    const dispatch = useAppDispatch()
+    const { dataList, selectedId } = useAppSelector(state => state.board)
+    const [input, setInput] = useState({ title: '', content: '' })
 
     useEffect(() => {
-        return () => {
-            setInput({ title: '', content: '' })
+        if (open) {
+            if (selectedId) {
+                for (let i = 0; i < dataList.length; i++) {
+                    if (dataList[i].seq == selectedId) {
+                        setInput({ title: dataList[i].title, content: dataList[i].content })
+                        break;
+                    }
+                }
+            } else {
+                setInput({ title: '', content: '' })
+            }
+        } else {
+            dispatch(setSelectedId(''))
         }
-    }, [open])
+        return () => {
+
+
+        }
+    }, [open, selectedId])
 
     const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setInput(pre => ({
@@ -33,7 +52,7 @@ const CreateBoard = ({ handleOk, handleClose, open }: any) => {
                     <TextField
                         name="title"
                         fullWidth
-                        value={intput.title}
+                        value={input.title}
                         onChange={handleInput}
                     />
                 </GridInputWrapper>
@@ -42,14 +61,14 @@ const CreateBoard = ({ handleOk, handleClose, open }: any) => {
                     <TextField
                         name="content"
                         fullWidth
-                        value={intput.content}
+                        value={input.content}
                         onChange={handleInput}
                     />
                 </GridInputWrapper>
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="error" sx={{ height: '30px' }} onClick={handleClose}>취소</Button>
-                <Button variant="contained" sx={{ marginRight: '5px', height: '30px' }} onClick={() => handleOk(intput)}>등록</Button>
+                <Button variant="contained" sx={{ marginRight: '5px', height: '30px' }} onClick={() => handleOk(input)}>등록</Button>
             </DialogActions>
         </Dialog>
     )
