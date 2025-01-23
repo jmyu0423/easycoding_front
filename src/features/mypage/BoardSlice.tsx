@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, isFulfilled, isRejected } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice, isFulfilled } from '@reduxjs/toolkit'
 import axiosInstance from '../../services/axiosInstance'
 import { AppState } from '../../ts/types'
 const initialState: any = {
