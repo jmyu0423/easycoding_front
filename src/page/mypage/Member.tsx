@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { getMembers } from '../../features/mypage/MemberSlice'
 import { getBoards, createBoards, deleteBoards, setSuccessFlag, setSelectedIdList, setSelectedId, updateBoards } from '../../features/mypage/BoardSlice'
 import { useAppDispatch, useAppSelector } from '../../helper/hooks'
 import { Box, Button } from '@mui/material';

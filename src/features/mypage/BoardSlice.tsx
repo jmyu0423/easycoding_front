@@ -15,7 +15,7 @@ const initialState: any = {
 //게시판 조회
 export const getBoards = createAsyncThunk(
     'board/data',
-    async (_, { rejectWithValue, getState }) => {
+    async (_, { rejectWithValue }) => {
         try {
             return await axiosInstance<any>('/selectBoardList')
         } catch (error: any) {
@@ -30,7 +30,7 @@ export const getBoards = createAsyncThunk(
 //게시판 등록
 export const createBoards = createAsyncThunk(
     'board/create',
-    async (input: any, { rejectWithValue, getState }) => {
+    async (input: any, { rejectWithValue }) => {
         const data = {
             title: input.title,
             content: input.content,
@@ -110,7 +110,7 @@ const board = createSlice({
                     state.dataList = payload.data
                 })
             .addMatcher(
-                isFulfilled(createBoards, deleteBoards, updateBoards), (state, { payload }) => {
+                isFulfilled(createBoards, deleteBoards, updateBoards), (state) => {
                     state.successFlag = true
                 })
     }

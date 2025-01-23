@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, isFulfilled, isRejected } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice, isFulfilled } from '@reduxjs/toolkit'
 import axiosInstance from '../../services/axiosInstance'
 
 const initialState: any = {
@@ -7,7 +7,7 @@ const initialState: any = {
 
 export const getMembers = createAsyncThunk(
     'member/data',
-    async (_, { rejectWithValue, getState }) => {
+    async (_, { rejectWithValue }) => {
         try {
             return await axiosInstance.post<any>('/selectMemberList')
         } catch (error: any) {
@@ -28,7 +28,7 @@ const member = createSlice({
     extraReducers: (builder) => {
         builder
             .addMatcher(
-                isFulfilled(getMembers), (state, { payload }) => {
+                isFulfilled(getMembers), (_, { payload }) => {
                     console.log(payload.data)
                 })
     }
