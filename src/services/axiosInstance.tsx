@@ -1,7 +1,9 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
-const BASE_URL = 'http://localhost:8080'
+const BASE_URL = process.env.NODE_ENV === 'development'
+    ? 'http://localhost:8080'
+    : 'http://192.168.0.87:8080';  // 배포된 서버 IP 또는 도메인 사용
 
 // const onFulfilled = (res: AxiosResponse<any, any>) => {
 //     if (!(res.status === 200 || res.status === 201 || res.status === 204)) throw new Error()
