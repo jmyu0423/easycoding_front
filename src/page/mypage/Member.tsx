@@ -111,7 +111,7 @@ const Member = () => {
         <>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
                 <div style={{ fontSize: '25px', fontWeight: 'bold', color: 'green' }}>
-                    이 지 코 딩
+                    준 명 테 스 트
                 </div>
                 <div>
                     <Button variant="outlined" color="error" sx={{ marginRight: '5px', height: '30px' }} onClick={deleteBoard}>삭제</Button>
