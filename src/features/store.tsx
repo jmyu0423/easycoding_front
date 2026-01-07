@@ -1,10 +1,14 @@
 import { AnyAction, combineReducers, configureStore } from '@reduxjs/toolkit'
 import memberSlice from './../features/mypage/MemberSlice'
 import BoardSlice from './mypage/BoardSlice'
+import AccountSlice from './account/AccountSlice'
+import AuthSlice from './auth/AuthSlice'
 
 const appReducer = combineReducers({
     member: memberSlice,
-    board: BoardSlice
+    board: BoardSlice,
+    account: AccountSlice,
+    auth: AuthSlice,
 })
 
 const reducerProxy = (state: any, action: AnyAction) => {

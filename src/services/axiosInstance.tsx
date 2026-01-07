@@ -1,15 +1,34 @@
-import axios from 'axios'
-import Cookies from 'js-cookie'
+import axios, { AxiosResponse, AxiosError } from 'axios'
 
 const BASE_URL = process.env.NODE_ENV === 'development'
     ? 'http://localhost:8080'
     : 'http://192.168.0.87:8080';  // 배포된 서버 IP 또는 도메인 사용
 
-// const onFulfilled = (res: AxiosResponse<any, any>) => {
-//     if (!(res.status === 200 || res.status === 201 || res.status === 204)) throw new Error()
-//     if (res.data.errors) throw new Error(res.data.errors)
-//     return res
-// }
+const onFulfilled = (res: AxiosResponse<any, any>) => {
+    if (!(res.status === 200 || res.status === 201 || res.status === 204)) throw new Error()
+    if (res.data.errors) throw new Error(res.data.errors)
+    return res
+}
+
+const refreshAccessToken = async (): Promise<string> => {
+    const refreshToken = sessionStorage.getItem('refreshToken')
+    if (!refreshToken) throw new Error('No refresh token')
+
+    const res = await refreshAxios.post(
+        '/refresh',
+        null,
+        {
+            headers: {
+                'X-Refresh-Token': refreshToken,
+            },
+        }
+    )
+
+    const newAccessToken = res.data.data.accessToken
+    sessionStorage.setItem('accessToken', newAccessToken)
+
+    return newAccessToken
+}
 
 // const onRejected = async (err: AxiosError<any>) => {
 //     // no token found
@@ -54,15 +73,52 @@ const axiosInstance = axios.create({
 })
 axiosInstance.interceptors.request.use(
     (config) => {
-        const token = Cookies.get('authToken')
+        const token = sessionStorage.getItem('accessToken')
+        console.log(token)
         if (token) {
-            config.headers.Authorization = token
+            config.headers.Authorization = `Bearer ${token}`
         }
         return config
     }, (error) => {
         return Promise.reject(error)
     }
 )
-// axiosInstance.interceptors.response.use(onFulfilled, onRejected)
+axiosInstance.interceptors.response.use(onFulfilled,
+    async (error: AxiosError) => {
+        const originalRequest: any = error.config
+
+        if (
+            error.response?.status === 401 &&
+            !originalRequest._retry &&
+            !originalRequest.url?.includes('/refresh')
+        ) {
+            originalRequest._retry = true
+
+            try {
+                const newAccessToken = await refreshAccessToken()
+
+                originalRequest.headers = {
+                    ...originalRequest.headers,
+                    Authorization: `Bearer ${newAccessToken}`,
+                }
+
+                return axiosInstance(originalRequest)
+            } catch (e) {
+                // sessionStorage.clear()
+                return Promise.reject(e)
+            }
+        }
+
+        return Promise.reject(error)
+    }
+)
+
+const refreshAxios = axios.create({
+    baseURL: BASE_URL,
+    timeout: 20000,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+})
 
 export default axiosInstance
